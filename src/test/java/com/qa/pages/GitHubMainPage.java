@@ -13,33 +13,28 @@ public class GitHubMainPage {
     private final SelenideElement openProject = $(".hkFRpV");
     private final ElementsCollection checkName = $$(".AuthorDisplayName-module__Text__OP5Q9");
 
-    public GitHubMainPage clickSearchMenu () {
-        switchTo().window(1);
+    public GitHubMainPage clickSearchMenu() {
         clickSearch.click();
-
         return this;
     }
-    public GitHubMainPage searchTextMenu (String query) {
+
+    public GitHubMainPage searchTextMenu(String query) {
         searchText.setValue(query);
-
         return this;
     }
 
-    public GitHubMainPage clickButtonSearch () {
+    public GitHubMainPage clickButtonSearch() {
         clickButton.click();
-
         return this;
     }
 
-    public GitHubMainPage openProjectGitHub () {
+    public GitHubMainPage openProjectGitHub() {
         openProject.click();
-
         return this;
     }
 
-    public GitHubMainPage checkNameOwner () {
-        checkName.get(0).shouldHave(text("Владислав Юстус"));
-
+    public GitHubMainPage checkNameOwner(String ownerName) {
+        checkName.get(0).shouldHave(text(ownerName));
         return this;
     }
 }

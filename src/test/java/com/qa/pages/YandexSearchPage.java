@@ -3,6 +3,7 @@ package com.qa.pages;
 import com.codeborne.selenide.SelenideElement;
 
 import static com.codeborne.selenide.Selenide.$;
+import static com.codeborne.selenide.Selenide.page;
 
 public class YandexSearchPage {
 
@@ -14,9 +15,9 @@ public class YandexSearchPage {
         return this;
     }
 
-    public YandexSearchPage clickSearch () {
+    public YandexResultPage clickSearch() {
         submitButton.click();
-        return this;
+        return page(YandexResultPage.class);
     }
 }
 
