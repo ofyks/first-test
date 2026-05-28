@@ -1,88 +1,74 @@
 package ru.bulgakov.webshop.test;
 
-import com.codeborne.selenide.selector.ByText;
-import net.datafaker.Faker;
-import org.junit.jupiter.api.BeforeEach;
+import io.qameta.allure.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import ru.bulgakov.webshop.page.WsCartPage;
-import ru.bulgakov.webshop.page.WsRegistrationPage;
+import ru.bulgakov.webshop.TestBase;
+import ru.bulgakov.webshop.page.CartPage;
+import ru.bulgakov.webshop.page.DesktopsPage;
+import ru.bulgakov.webshop.page.MainPage;
+import ru.bulgakov.webshop.page.ProductPage;
 import ru.bulgakov.webshop.steps.AuthSteps;
 
-import static com.codeborne.selenide.Condition.text;
-import static com.codeborne.selenide.Condition.visible;
-import static com.codeborne.selenide.Selectors.byText;
-import static com.codeborne.selenide.Selenide.*;
+import java.util.Locale;
+
+import static com.codeborne.selenide.Selenide.open;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static ru.bulgakov.webshop.config.Config.WEB_SHOP_REGISTRATION;
 import static ru.bulgakov.webshop.config.Config.WEB_SHOP_URL;
 
-public class CartTest {
-    private static final Faker faker = new Faker();
+
+@Epic("Покупки")
+@Feature("Корзина товаров")
+public class CartTest extends TestBase {
+
     private final AuthSteps authSteps = new AuthSteps();
 
-    @BeforeEach
-    void beforeEach() {
-        authSteps.registerNewUser();
-    }
-
     @Test
+    @DisplayName("Добавление товара в корзину с выбором процессора и проверкой итоговой суммы")
+    @Severity(SeverityLevel.NORMAL)
+    @Owner("Кирюха")
+    @Link(name = "CART-1", url = "https://demowebshop.tricentis.com/computers")
     void addItemToCartTest() {
-        open(WEB_SHOP_URL);
+        authSteps.registerNewUser();
 
-        WsCartPage cartPage = new WsCartPage();
-
-        String itemQuantity = "4";
-
-        cartPage.navigateToDesktops()
+        ProductPage productPage = open(WEB_SHOP_URL, MainPage.class)
+                .hoverComputersMenu()
+                .selectDesktops()
                 .selectFirstProduct();
 
-        String itemName = cartPage.getItemName();
+        String itemName = productPage.getProductName();
+        String itemPrice = productPage.getProductPrice();
+        String itemQuantity = "4";
+        int processorIndex = 11;
 
-        cartPage.selectProcessor(2)
+        productPage.selectProcessor(processorIndex)
                 .setQuantity(itemQuantity)
                 .addToCart()
                 .verifySuccessNotification()
                 .verifyCartQuantityBadge(itemQuantity)
                 .openCart()
-                .verifyItemNameInCart(itemName);
+                .verifyCartContents(
+                        itemName,
+                        itemQuantity,
+                        calculateExpectedTotal(itemPrice, processorIndex, itemQuantity)
+                );
+    }
 
-        String itemQuantityInCart = cartPage.getQuantityInCart();
-        assertEquals(itemQuantity, itemQuantityInCart);
+    private float getProcessorSurcharge(int processorIndex) {
+        return switch (processorIndex) {
+            case 0 -> 0f;
+            case 1 -> 15f;
+            case 2 -> 100f;
+            default -> throw new IllegalArgumentException("Unknown processor index: " + processorIndex);
+        };
+    }
 
-        cartPage.verifySubtotalCalculated(cartPage.getUnitPriceFromCart(), itemQuantity);
-
-        System.out.println(1);
+    private String calculateExpectedTotal(String price, int processorIndex, String quantity) {
+        float basePrice = Float.parseFloat(price.replace("$", "").replace(",", "."));
+        float surcharge = getProcessorSurcharge(processorIndex);
+        float total = (basePrice + surcharge) * Float.parseFloat(quantity);
+        return String.format(Locale.US, "%.2f", total);
     }
 }
-
-
-
-
-
-//open(WEB_SHOP_URL);
-//        $$("ul.top-menu li a").get(1).hover();
-//        $(byText("Desktops")).click();
-//        $$("div.product-grid div").get(0).click();
-//
-//        String itemName = $("[itemprop=name]").getText(); // itemName: "Build your own cheap computer"
-//        String itemPrice = $("[itemprop=price]").getText(); // itemPrice: "800.00"
-//        String itemQuantity = "2";
-//
-//
-//        $$("dl dd ul li").get(0).$("li input").click();
-//        $("input.qty-input").setValue(itemQuantity);
-//        $("input.add-to-cart-button").click();
-//        $("div.bar-notification.success").shouldBe(visible);
-//        $("span.cart-qty").shouldHave(text("(" + itemQuantity + ")"));
-//        $("a.ico-cart").click();
-//
-//        $("a.product-name").shouldHave(text(itemName));
-//
-//
-//        String itemQuantityInCart = $("input.qty-input").getAttribute("value");
-//        assertEquals(itemQuantity, itemQuantityInCart);
-//
-//
-//        $("span.product-subtotal").shouldHave(text(String.valueOf(
-//        Float.parseFloat(itemPrice) * Float.parseFloat(itemQuantity))));
-//        }
