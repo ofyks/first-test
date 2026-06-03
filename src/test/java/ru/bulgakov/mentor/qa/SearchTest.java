@@ -1,18 +1,9 @@
-package ru.bulgakov.qa;
+package ru.bulgakov.mentor.qa;
 
-import com.codeborne.selenide.Configuration;
-import com.codeborne.selenide.SelenideElement;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.By;
-import ru.bulgakov.pages.WelcomePage;
-import ru.bulgakov.pages.YandexResultsPage;
-import ru.bulgakov.pages.YandexSearchPage;
+import ru.bulgakov.mentor.pages.YandexSearchPage;
 
-import static com.codeborne.selenide.Condition.text;
-import static com.codeborne.selenide.Condition.visible;
-import static com.codeborne.selenide.Selectors.byText;
 import static com.codeborne.selenide.Selenide.*;
 
 public class SearchTest {
@@ -21,10 +12,10 @@ public class SearchTest {
     @DisplayName("Проверить, что цена обучения 47 000 рублей")
     void mentoringPrice47000Test() {
         open("https://ya.ru/", YandexSearchPage.class)
-                .search("bulgakov qa")
+                .search("ivan qa")
                 .submit()
                 .closeDefaultBrowserWindow()
-                .openLink("ivanbulgakovqa.ru")
+                .openLink("ivan.ru")
                 .clickToPrice()
                 .clickTryQaMentor()
                 .clickButtonTextRunPay()
@@ -71,7 +62,7 @@ public class SearchTest {
  * 3. нажать кнопку поиск
  * 4. в поисковой выдаче найти нужный сайт, кликнуть на него
  * 5. нажать на кнопку стоимость
- * 6. нажать на кнопку "Хочу вкатиться в QA"
+ * 6. нажать на кнопку "Хочу  в AQA"
  * 7. нажать на кнопку "Бегу оплачивать"
  * 8. проверить, что к оплате 47 000 рублей
  * */
